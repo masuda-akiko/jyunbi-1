@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朝の学校準備チェックシート</title>
+<style>
+  body { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; max-width: 760px; margin: auto; padding: 20px; background:#f7fbff; color:#222; }
+  .card { background:#fff; border-radius:18px; padding:22px; box-shadow:0 4px 14px rgba(0,0,0,.08); }
+  h1 { text-align:center; margin-top:0; }
+  .progressBox { background:#eef7ff; border:2px solid #b7def7; border-radius:14px; padding:16px; text-align:center; font-size:20px; font-weight:bold; margin-bottom:16px; }
+  .percent { font-size:34px; margin-top:6px; }
+  .timerBox { background:#fff8e8; border:2px solid #f0d38a; border-radius:14px; padding:14px; text-align:center; margin-bottom:18px; }
+  #timer { font-size:34px; font-weight:bold; letter-spacing:1px; margin:8px 0; }
+  label { display:block; margin:9px 0; padding:12px; border:1px solid #ccc; border-radius:12px; background:#fff; font-size:18px; }
+  input { transform:scale(1.35); margin-right:10px; }
+  .done { background:#e9ffe9; text-decoration:line-through; color:#555; }
+  button { border:0; border-radius:12px; padding:12px 18px; margin:5px; font-size:16px; cursor:pointer; font-weight:bold; }
+  .start { background:#d9f2d9; }
+  .stop { background:#ffe2b8; }
+  .reset { background:#ffd6d6; width:100%; margin-top:18px; }
+  .note { text-align:center; font-size:14px; color:#555; }
+  @media print { button { display:none; } body { background:#fff; } .card { box-shadow:none; } }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🌞 朝の学校準備チェックシート</h1>
+
+  <div class="progressBox">
+    <div id="progressText">0項目中0達成</div>
+    <div class="percent" id="percentText">0％</div>
+  </div>
+
+  <div class="timerBox">
+    <div>⏱ かかった時間</div>
+    <div id="timer">00:00:00</div>
+    <button class="start" onclick="startTimer()">スタート</button>
+    <button class="stop" onclick="stopTimer()">ストップ</button>
+  </div>
+
+  <div id="list">
+    <label><input type="checkbox" class="check"> 起きる（目覚ましを止める）</label>
+<label><input type="checkbox" class="check"> 顔を洗う</label>
+<label><input type="checkbox" class="check"> 歯をみがく</label>
+<label><input type="checkbox" class="check"> 着替える（ハンカチ・ティッシュも持った？）</label>
+<label><input type="checkbox" class="check"> 朝ごはんを食べる</label>
+<label><input type="checkbox" class="check"> トイレをすませる</label>
+<label><input type="checkbox" class="check"> 水とうを持った？</label>
+<label><input type="checkbox" class="check"> 宿題をランドセルに入れた？</label>
+<label><input type="checkbox" class="check"> 連絡帳を入れた？</label>
+<label><input type="checkbox" class="check"> 教科書・ノートは時間割どおり？</label>
+<label><input type="checkbox" class="check"> 筆箱の中を確認した？</label>
+<label><input type="checkbox" class="check"> 名札をつけた？</label>
+<label><input type="checkbox" class="check"> 「いってきます！」と元気にあいさつ！</label>
+  </div>
+
+  <button class="reset" onclick="resetAll()">リセット</button>
+  <p class="note">全部終わったら自動でストップウォッチが止まります。</p>
+</div>
+
+<script>
+const checks = document.querySelectorAll('.check');
+const total = checks.length;
+let seconds = 0;
+let timerId = null;
+
+function formatTime(sec) {
+  const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+  const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
+function updateProgress() {
+  const done = document.querySelectorAll('.check:checked').length;
+  const percent = Math.round((done / total) * 100);
+  document.getElementById('progressText').textContent = `${total}項目中${done}達成`;
+  document.getElementById('percentText').textContent = `${percent}％`;
+  checks.forEach(c => c.parentElement.classList.toggle('done', c.checked));
+  if (done === total) stopTimer();
+}
+
+function startTimer() {
+  if (timerId) return;
+  timerId = setInterval(() => {
+    seconds++;
+    document.getElementById('timer').textContent = formatTime(seconds);
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerId);
+  timerId = null;
+}
+
+function resetAll() {
+  stopTimer();
+  seconds = 0;
+  document.getElementById('timer').textContent = '00:00:00';
+  checks.forEach(c => c.checked = false);
+  updateProgress();
+}
+
+checks.forEach(c => c.addEventListener('change', updateProgress));
+updateProgress();
+</script>
+</body>
+</html>
